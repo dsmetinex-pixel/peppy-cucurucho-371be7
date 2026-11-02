@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metinex Aluminium | Inventory Management</title>
+<style>
+:root{--navy:#14243a;--blue:#2563eb;--bg:#f3f6fb;--line:#e4eaf2;--muted:#64748b;--green:#0f9d72;--red:#dc4c4c}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#182538}
+header{background:var(--navy);color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:20px;margin:0}header small{color:#cbd5e1}
+.layout{display:flex;min-height:calc(100vh - 68px)}nav{width:220px;background:#fff;border-right:1px solid var(--line);padding:18px 12px}
+nav button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:13px 14px;margin:4px 0;border-radius:8px;font-size:14px;color:#334155;cursor:pointer}
+nav button.active,nav button:hover{background:#eaf1ff;color:var(--blue);font-weight:bold}
+main{padding:24px;flex:1;min-width:0;max-width:1500px;margin:auto;width:100%}
+.page{display:none}.page.active{display:block}.heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h2{font-size:22px;margin:0 0 5px}.sub{color:var(--muted);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:14px;margin-bottom:20px}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px;box-shadow:0 2px 8px #15243a08}
+.card span{color:var(--muted);font-size:13px}.card strong{display:block;font-size:25px;margin-top:8px}
+.panel{margin-bottom:18px}.panel h3{margin:0 0 16px;font-size:16px}
+.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+label{display:block;font-size:12px;color:#475569;font-weight:600;margin-bottom:6px}
+input,select{width:100%;padding:11px;border:1px solid #d6deea;border-radius:7px;background:#fff;font-size:14px;color:#172337}
+input:focus,select:focus{outline:2px solid #bfdbfe;border-color:var(--blue)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.btn{border:0;border-radius:7px;padding:11px 16px;background:var(--blue);color:#fff;font-weight:600;cursor:pointer}
+.btn.secondary{background:#e8eef7;color:#26364c}.btn.green{background:var(--green)}.btn.red{background:var(--red)}
+table{width:100%;border-collapse:collapse;min-width:680px}th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{background:#f8fafc;color:#475569}
+.tablewrap{overflow:auto}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px}.toolbar input{max-width:280px}
+.pill{padding:4px 8px;border-radius:20px;background:#e8f7f1;color:#087653;font-size:11px}
+.empty{text-align:center;color:var(--muted);padding:24px}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+@media(max-width:850px){.layout{display:block}nav{width:100%;display:flex;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line)}nav button{white-space:nowrap;width:auto;margin:0 3px}.cards{grid-template-columns:repeat(2,1fr)}main{padding:15px}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.formgrid{grid-template-columns:1fr}.cards{gap:9px}.card{padding:13px}.card strong{font-size:21px}header{padding:15px}}
+</style>
+</head>
+<body>
+<header><div><h1>METINEX ALUMINIUM</h1><small>Inventory Management System</small></div><small id="today"></small></header>
+<div class="layout">
+<nav>
+<button class="active" data-page="home">⌂ &nbsp; Home</button>
+<button data-page="stock">▤ &nbsp; Live Stock</button>
+<button data-page="products">▦ &nbsp; Products</button>
+<button data-page="reports">▥ &nbsp; Reports</button>
+<button data-page="logs">◷ &nbsp; Log</button>
+</nav>
+<main>
+<section id="home" class="page active">
+<div class="heading"><div><h2>Inventory Dashboard</h2><div class="sub">Inventory transaction and inventory amount</div></div></div>
+<div class="cards">
+<div class="card"><span>Total Products</span><strong id="totalProducts">0</strong></div>
+<div class="card"><span>Stock Items</span><strong id="stockItems">0</strong></div>
+<div class="card"><span>Total Inventory Amount</span><strong id="inventoryAmount">₹0.00</strong></div>
+<div class="card"><span>Transactions</span><strong id="transactions">0</strong></div>
+</div>
+<div class="panel">
+<h3>Stock In</h3>
+<form id="stockInForm">
+<div class="formgrid">
+<div><label>Product Name</label><select id="inProduct" required></select></div>
+<div><label>Quantity</label><input id="inQty" type="number" min="0.001" step="any" required placeholder="Enter quantity"></div>
+<div><label>Unit</label><select id="inUnit" required></select></div>
+<div><label>Previous Stock</label><input id="inPrevious" readonly placeholder="Auto shown"></div>
+<div><label>HSN Code</label><input id="inHsn" readonly placeholder="Auto filled"></div>
+<div><label>Rate per Unit (₹)</label><input id="inRate" type="number" min="0" step="0.01" required placeholder="Auto filled"></div>
+<div><label>Date</label><input id="inDate" type="date" required></div>
+<div><label>Firm Name</label><input id="inFirm" required placeholder="Enter firm name"></div>
+</div>
+<div class="actions"><button class="btn green" type="submit">＋ Add Stock (In)</button></div>
+</form>
+</div>
+<div class="panel">
+<h3>Stock Out</h3>
+<form id="stockOutForm">
+<div class="formgrid">
+<div><label>Party Name</label><input id="outParty" required placeholder="Enter party name"></div>
+<div><label>Product Name</label><select id="outProduct" required></select></div>
+<div><label>Quantity</label><input id="outQty" type="number" min="0.001" step="any" required placeholder="Enter quantity"></div>
+<div><label>Unit</label><select id="outUnit" required></select></div>
+<div><label>Previous Stock</label><input id="outPrevious" readonly placeholder="Auto shown"></div>
+<div><label>HSN Code</label><input id="outHsn" readonly placeholder="Auto filled"></div>
+<div><label>Rate per Unit (₹)</label><input id="outRate" type="number" min="0" step="0.01" required placeholder="Auto filled"></div>
+<div><label>Date</label><input id="outDate" type="date" required></div>
+</div>
+<div class="actions"><button class="btn red" type="submit">− Remove Stock (Out)</button></div>
+</form>
+<p class="note">Stock balance updates automatically. Stock out cannot exceed available stock.</p>
+</div>
+</section>
+<section id="stock" class="page">
+<div class="heading"><div><h2>Live Stock</h2><div class="sub">Real-time inventory balance and value</div></div></div>
+<div class="panel"><div class="toolbar"><input id="stockSearch" placeholder="Search product..."></div><div class="tablewrap"><table><thead><tr><th>Product</th><th>HSN Code</th><th>Unit</th><th>Rate / Unit</th><th>Available Stock</th><th>Stock Value</th></tr></thead><tbody id="stockTable"></tbody></table></div></div>
+</section>
+<section id="products" class="page">
+<div class="heading"><div><h2>My Products</h2><div class="sub">Manage product catalog</div></div></div>
+<div class="panel"><h3>Add Product</h3><form id="productForm"><div class="formgrid">
+<div><label>Product Name</label><input id="productName" required placeholder="Enter product name"></div>
+<div><label>HSN Code</label><input id="productHsn" placeholder="Enter HSN code"></div>
+<div><label>Unit</label><select id="productUnit"></select></div>
+<div><label>Rate per Unit (₹)</label><input id="productRate" type="number" min="0" step="0.01" required placeholder="Enter rate"></div>
+</div><div class="actions"><button class="btn" type="submit">＋ Add Product</button></div></form></div>
+<div class="panel"><h3>Product Catalog</h3><div class="toolbar"><input id="productSearch" placeholder="Search product..."></div><div class="tablewrap"><table><thead><tr><th>Product Name</th><th>HSN Code</th><th>Unit</th><th>Rate / Unit</th><th>Action</th></tr></thead><tbody id="productTable"></tbody></table></div></div>
+</section>
+<section id="reports" class="page">
+<div class="heading"><div><h2>Reports</h2><div class="sub">Export stock in and stock out records to Excel-compatible CSV</div></div></div>
+<div class="panel"><h3>Transaction Report</h3><div class="toolbar"><label>From date <input type="date" id="fromDate"></label><label>To date <input type="date" id="toDate"></label><select id="reportType"><option value="all">All Transactions</option><option value="in">Stock In</option><option value="out">Stock Out</option></select></div><div class="actions"><button class="btn" onclick="exportReport()">Download Excel Report (.csv)</button></div><div class="tablewrap" style="margin-top:15px"><table><thead><tr><th>Date</th><th>Type</th><th>Product</th><th>Party / Firm</th><th>Quantity</th><th>Unit</th><th>Rate</th><th>Amount</th></tr></thead><tbody id="reportTable"></tbody></table></div></div>
+</section>
+<section id="logs" class="page">
+<div class="heading"><div><h2>Activity Log</h2><div class="sub">Recent inventory activity</div></div></div>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>Date</th><th>Action</th><th>Product</th><th>Details</th></tr></thead><tbody id="logTable"></tbody></table></div></div>
+</section>
+</main></div>
+<script>
+const UNITS=['pc','kg','roll','sqft','pkt','set','box','pair','bag'];
+const $=id=>document.getElementById(id);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=new Date().toISOString().slice(0,10);
+$('today').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+let products=JSON.parse(localStorage.getItem('metinex_products')||'[]');
+let transactions=JSON.parse(localStorage.getItem('metinex_transactions')||'[]');
+function save(){localStorage.setItem('metinex_products',JSON.stringify(products));localStorage.setItem('metinex_transactions',JSON.stringify(transactions));render();}
+function stockOf(id){return transactions.reduce((s,t)=>s+(t.productId===id?(t.type==='in'?Number(t.qty):-Number(t.qty)):0),0);}
+function fillUnits(){['inUnit','outUnit','productUnit'].forEach(id=>$(id).innerHTML=UNITS.map(u=>`<option>${u}</option>`).join(''));}
+function fillProducts(){
+ const opts='<option value="">Select product</option>'+products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+ $('inProduct').innerHTML=opts;$('outProduct').innerHTML=opts;
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function productSelected(prefix){
+ const p=products.find(x=>x.id===$(prefix+'Product').value);
+ $(prefix+'Previous').value=p?stockOf(p.id):'';
+ $(prefix+'Hsn').value=p?p.hsn:'';
+ $(prefix+'Rate').value=p?p.rate:'';
+ if(p)$(prefix+'Unit').value=p.unit;
+}
+$('inProduct').addEventListener('change',()=>productSelected('in'));
+$('outProduct').addEventListener('change',()=>productSelected('out'));
+$('productForm').addEventListener('submit',e=>{
+ e.preventDefault();const name=$('productName').value.trim();
+ if(products.some(p=>p.name.toLowerCase()===name.toLowerCase()))return alert('This product already exists.');
+ products.push({id:Date.now().toString(),name,hsn:$('productHsn').value.trim(),unit:$('productUnit').value,rate:Number($('productRate').value)});
+ $('productForm').reset();save();alert('Product added successfully.');
+});
+$('stockInForm').addEventListener('submit',e=>{
+ e.preventDefault();const p=products.find(x=>x.id===$('inProduct').value);if(!p)return alert('Please add/select a product first.');
+ const qty=Number($('inQty').value),unit=$('inUnit').value;if(qty<=0)return alert('Enter a valid quantity.');
+ transactions.push({id:Date.now().toString(),type:'in',productId:p.id,product:p.name,qty,unit,rate:Number($('inRate').value),date:$('inDate').value,party:$('inFirm').value.trim(),hsn:p.hsn});
+ $('stockInForm').reset();setDates();save();alert('Stock added successfully.');
+});
+$('stockOutForm').addEventListener('submit',e=>{
+ e.preventDefault();const p=products.find(x=>x.id===$('outProduct').value);if(!p)return alert('Please add/select a product first.');
+ const qty=Number($('outQty').value),available=stockOf(p.id);if(qty<=0)return alert('Enter a valid quantity.');
+ if(qty>available)return alert('Insufficient stock. Available: '+available+' '+p.unit);
+ transactions.push({id:Date.now().toString(),type:'out',productId:p.id,product:p.name,qty,unit:$('outUnit').value,rate:Number($('outRate').value),date:$('outDate').value,party:$('outParty').value.trim(),hsn:p.hsn});
+ $('stockOutForm').reset();setDates();save();alert('Stock removed successfully.');
+});
+function setDates(){['inDate','outDate'].forEach(id=>$(id).value=today);}
+function render(){
+ fillProducts();
+ $('totalProducts').textContent=products.length;
+ $('stockItems').textContent=products.filter(p=>stockOf(p.id)>0).length;
+ $('inventoryAmount').textContent=money(products.reduce((s,p)=>s+Math.max(0,stockOf(p.id))*Number(p.rate),0));
+ $('transactions').textContent=transactions.length;
+ const stockRows=products.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.hsn||'-')}</td><td>${esc(p.unit)}</td><td>${money(p.rate)}</td><td>${stockOf(p.id).toLocaleString('en-IN')}</td><td>${money(stockOf(p.id)*p.rate)}</td></tr>`).join('');
+ $('stockTable').innerHTML=stockRows||'<tr><td colspan="6" class="empty">No products added yet.</td></tr>';
+ const q=$('productSearch').value.toLowerCase();
+ $('productTable').innerHTML=products.filter(p=>p.name.toLowerCase().includes(q)).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.hsn||'-')}</td><td>${esc(p.unit)}</td><td>${money(p.rate)}</td><td><button class="btn secondary" onclick="editProduct('${p.id}')">Edit</button> <button class="btn red" onclick="deleteProduct('${p.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="5" class="empty">No products found.</td></tr>';
+ $('stockSearch').value=$('stockSearch').value;
+ $('stockTable').innerHTML=products.filter(p=>p.name.toLowerCase().includes($('stockSearch').value.toLowerCase())).map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.hsn||'-')}</td><td>${esc(p.unit)}</td><td>${money(p.rate)}</td><td>${stockOf(p.id).toLocaleString('en-IN')}</td><td>${money(stockOf(p.id)*p.rate)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No matching products.</td></tr>';
+ const filtered=getFiltered();$('reportTable').innerHTML=filtered.map(t=>`<tr><td>${esc(t.date)}</td><td><span class="pill">${t.type.toUpperCase()}</span></td><td>${esc(t.product)}</td><td>${esc(t.party)}</td><td>${t.qty}</td><td>${esc(t.unit)}</td><td>${money(t.rate)}</td><td>${money(t.qty*t.rate)}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No transactions found.</td></tr>';
+ $('logTable').innerHTML=[...transactions].reverse().map(t=>`<tr><td>${esc(t.date)}</td><td>${t.type==='in'?'Stock In':'Stock Out'}</td><td>${esc(t.product)}</td><td>${t.qty} ${esc(t.unit)} · ${esc(t.party)}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">No activity yet.</td></tr>';
+}
+function editProduct(id){const p=products.find(x=>x.id===id);if(!p)return;const name=prompt('Product name:',p.name);if(name===null)return;if(!name.trim())return alert('Product name cannot be empty.');p.name=name.trim();p.hsn=prompt('HSN Code:',p.hsn)||'';const rate=prompt('Rate per unit:',p.rate);if(rate!==null&&!isNaN(Number(rate)))p.rate=Number(rate);save();}
+function deleteProduct(id){if(transactions.some(t=>t.productId===id))return alert('Cannot delete this product because it has transaction history.');if(confirm('Delete this product?')){products=products.filter(p=>p.id!==id);save();}}
+function getFiltered(){const from=$('fromDate').value,to=$('toDate').value,type=$('reportType').value;return transactions.filter(t=>(!from||t.date>=from)&&(!to||t.date<=to)&&(type==='all'||t.type===type)).sort((a,b)=>a.date.localeCompare(b.date));}
+function exportReport(){
+ const rows=getFiltered(),header=['Date','Type','Product','Party/Firm','Quantity','Unit','HSN Code','Rate per Unit','Amount'];
+ const data=[header,...rows.map(t=>[t.date,t.type==='in'?'Stock In':'Stock Out',t.product,t.party,t.qty,t.unit,t.hsn,t.rate,(t.qty*t.rate).toFixed(2)])];
+ const csv=data.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=`Metinex_${$('reportType').value}_Report_${today}.csv`;a.click();URL.revokeObjectURL(url);
+}
+['productSearch','stockSearch','fromDate','toDate','reportType'].forEach(id=>$(id).addEventListener('input',render));
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.page).classList.add('active');render();}));
+fillUnits();setDates();render();
+</script>
+</body>
+</html>
